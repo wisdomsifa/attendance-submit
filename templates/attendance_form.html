@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Attendance - {{ lecture.title }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .attendance-content {
+            max-width: 600px;
+            width: 100%;
+            margin: 2rem;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #dc3545;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 0.8rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            color: white;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        .lecture-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .lecture-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2C3639;
+            margin-bottom: 0.5rem;
+        }
+        .course-name {
+            font-size: 1.2rem;
+            color: #A27B5C;
+        }
+    </style>
+</head>
+<body>
+    <div class="attendance-content">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="lecture-info">
+                    <h2 class="lecture-title">{{ lecture.title }}</h2>
+                    <div class="course-name">{{ lecture.course_name }}</div>
+                </div>
+                
+                <div class="countdown" id="countdown">
+                    Time remaining: <span id="timer"></span>
+                </div>
+                
+                <form id="attendanceForm" action="{{ url_for('submit_attendance', link_code=lecture.link_code) }}" method="post">
+                    <div class="mb-3">
+                        <label for="student_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="student_name" name="student_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="admission_number" class="form-label">Admission Number</label>
+                        <input type="text" class="form-control" id="admission_number" name="admission_number" 
+                               pattern="[A-Za-z]+/\d+/\d+" 
+                               title="Format: course code/admission number/year"
+                               placeholder="e.g., CSC/12345/2023"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-submit">Submit Attendance</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const expiryTime = new Date("{{ lecture.expiry_time.isoformat() }}").getTime();
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const distance = expiryTime - now;
+        
+        if (distance <= 0) {
+            document.getElementById('timer').innerHTML = "EXPIRED";
+            document.getElementById('attendanceForm').style.display = 'none';
+            return;
+        }
+        
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        document.getElementById('timer').innerHTML = 
+            minutes + "m " + seconds + "s";
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const submitUrl = form.getAttribute('action');
+        fetch(submitUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(new FormData(form))
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Attendance submitted successfully!');
+                window.close();
+            } else {
+                return response.text().then(text => {
+                    throw new Error(text);
+                });
+            }
+        })
+        .catch(error => {
+            alert(error.message || 'Error submitting attendance. Please try again.');
+        });
+    });
+    </script>
+</body>
+</html>

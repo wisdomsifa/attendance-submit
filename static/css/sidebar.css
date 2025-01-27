@@ -1,0 +1,90 @@
+:root {
+    --primary-color: #2C3639;
+    --accent-color: #A27B5C;
+    --background-light: #F9F9F9;
+    --text-color: #2C3639;
+    --sidebar-width: 280px;
+}
+
+#sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: white;
+    border-right: 1px solid rgba(0,0,0,0.05);
+    position: fixed;
+    padding: 2rem;
+    z-index: 1030;
+}
+
+.offcanvas #sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+    border: none;
+}
+
+.profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.nav-link {
+    color: var(--text-color);
+    padding: 0.8rem 1rem;
+    margin: 0.2rem 0;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background-color: var(--background-light);
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+.nav-link.active {
+    background-color: var(--background-light);
+    color: var(--accent-color);
+    opacity: 1;
+}
+
+.nav-link i {
+    width: 24px;
+    margin-right: 10px;
+}
+
+.menu-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-color);
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+.username {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+.user-title {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 992px) {
+    #sidebar {
+        width: 100%;
+        position: relative;
+        min-height: auto;
+    }
+}

@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="main-content">
+    <div class="dashboard-header">
+        <h1>Lecturer Dashboard</h1>
+        <p class="lead">Generate and manage attendance links</p>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Generate New Attendance Link</h5>
+            <form action="{{ url_for('generate_attendance_link') }}" method="post">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Lecture Title</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="course_name" class="form-label">Course Name</label>
+                    <input type="text" class="form-control" id="course_name" name="course_name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="expiry_minutes" class="form-label">Link Expiry (minutes)</label>
+                    <input type="number" class="form-control" id="expiry_minutes" name="expiry_minutes" min="1" max="180" value="60" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Generate Link</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Active Attendance Links</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Link</th>
+                            <th>Expires</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lecture in active_lectures %}
+                        <tr>
+                            <td>{{ lecture.title }}</td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" value="{{ url_for('attendance_form', link_code=lecture.link_code, _external=True) }}" readonly>
+                                    <button class="btn btn-outline-secondary copy-link" type="button">Copy</button>
+                                </div>
+                            </td>
+                            <td>{{ lecture.expiry_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <a href="{{ url_for('download_attendance', lecture_id=lecture.id) }}" class="btn btn-sm btn-success">Download PDF</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.copy-link').forEach(button => {
+    button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        input.select();
+        document.execCommand('copy');
+        
+        const originalText = this.textContent;
+        this.textContent = 'Copied!';
+        setTimeout(() => {
+            this.textContent = originalText;
+        }, 2000);
+    });
+});
+</script>
+{% endblock %}

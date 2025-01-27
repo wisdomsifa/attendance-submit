@@ -1,0 +1,17 @@
+CREATE TABLE lecture (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lecturer_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    link_code VARCHAR(50) NOT NULL UNIQUE,
+    expiry_time DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (lecturer_id) REFERENCES user(id)
+);
+
+CREATE TABLE attendance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lecture_id INTEGER NOT NULL,
+    admission_number VARCHAR(50) NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (lecture_id) REFERENCES lecture(id)
+);

@@ -37,8 +37,12 @@ def apply_sqlite_migrations(engine: sqlalchemy.Engine, base_type: DeclarativeBas
                 with open(os.path.join(migration_folder, migration_file), 'r') as f:
                     migration_sql = f.read()
                 
-                # Execute migration
-                connection.execute(sqlalchemy.text(migration_sql))
+                # Split SQL statements and execute them individually
+                statements = migration_sql.split(';')
+                for statement in statements:
+                    statement = statement.strip()
+                    if statement:  # Only execute non-empty statements
+                        connection.execute(sqlalchemy.text(statement))
                 
                 # Record migration as applied
                 connection.execute(sqlalchemy.text(
